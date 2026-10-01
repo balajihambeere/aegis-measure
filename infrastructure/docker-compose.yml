@@ -1,0 +1,66 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: aegis
+      POSTGRES_PASSWORD: aegis
+      POSTGRES_DB: aegis
+    ports:
+      - "55433:5432"
+    volumes:
+      - aegis_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aegis"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  reference-assistant:
+    build:
+      context: ../apps/reference-assistant
+    env_file:
+      - ../.env
+    ports:
+      - "8100:8100"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../apps/api
+    env_file:
+      - ../.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://aegis:aegis@postgres:5432/aegis
+      REFERENCE_ASSISTANT_URL: http://reference-assistant:8100
+      CORS_ALLOWED_ORIGINS: http://localhost:3300
+    depends_on:
+      postgres:
+        condition: service_healthy
+      reference-assistant:
+        condition: service_healthy
+    ports:
+      - "8001:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ../apps/web
+    env_file:
+      - ../.env
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8001
+    depends_on:
+      - api
+    ports:
+      - "3300:3000"
+
+volumes:
+  aegis_pg_data:

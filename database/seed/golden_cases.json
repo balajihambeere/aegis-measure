@@ -1,0 +1,118 @@
+{
+  "_comment": "Real-world-style incidents used to seed and demo Aegis Measure.",
+  "suites": [
+    {
+      "name": "fabric-and-care",
+      "description": "Fabric and care questions — the saree category where quality first quietly degraded.",
+      "default_schedule_interval_hours": 6,
+      "cases": [
+        {
+          "question": "What fabric is the Rajasthani block-print saree (SKU BPS-2214), and what does it need for care?",
+          "context": "SKU BPS-2214 — Rajasthani block-print saree. Fabric: pure mulberry silk. Care: dry clean only. Do not machine wash or hand wash; both can damage the fabric and the block-print dye.",
+          "reference_answer": "Pure mulberry silk — dry clean only. Do not machine wash or hand wash; both can damage the fabric and the block-print dye.",
+          "reviewers": ["Chitrangada", "merchandising-lead"],
+          "source": "real_complaint",
+          "check_mode": "both"
+        },
+        {
+          "question": "Does the indigo block-print saree (SKU BPS-2231) need dry cleaning, or can I hand-wash it in cold water?",
+          "context": "SKU BPS-2231 — Indigo block-print saree. Fabric: pure mulberry silk. Care: dry clean only. Hand-washing, even in cold water, will damage this piece.",
+          "reference_answer": "Dry clean only — pure silk. Hand-washing, even in cold water, will damage this piece.",
+          "reviewers": ["Chitrangada", "merchandising-lead"],
+          "source": "real_complaint",
+          "check_mode": "both"
+        }
+      ]
+    },
+    {
+      "name": "dupatta-care",
+      "description": "The incident that exposed the component-check blind spot — a retrieval bug substituting a near-duplicate dupatta's listing.",
+      "default_schedule_interval_hours": 6,
+      "cases": [
+        {
+          "question": "Does the teal cotton dupatta (SKU DUP-3390) need hand washing, or is machine-wash fine?",
+          "context": "SKU DUP-3390 — Teal cotton dupatta. Fabric: cotton with reactive dye. Care: hand-wash separately, colour may run. Do not machine wash with other items.",
+          "reference_answer": "Hand-wash separately — colour may run. Do not machine wash with other items.",
+          "reviewers": ["Chitrangada", "merchandising-lead"],
+          "source": "real_complaint",
+          "check_mode": "both"
+        }
+      ]
+    },
+    {
+      "name": "footwear-sizing",
+      "description": "The footwear catalog restructuring that a deploy-only trigger couldn't catch — the case for a fixed-interval schedule.",
+      "default_schedule_interval_hours": 6,
+      "cases": [
+        {
+          "question": "Does the standard-fit running shoe (SKU FTW-1187) come in half sizes?",
+          "context": "SKU FTW-1187 — Running shoes, standard fit. Sizing: full sizes only (no half sizes stocked for this model).",
+          "reference_answer": "No — this model (FTW-1187) is stocked in full sizes only, no half sizes.",
+          "reviewers": ["Chitrangada", "merchandising-lead"],
+          "source": "real_complaint",
+          "check_mode": "both"
+        }
+      ]
+    },
+    {
+      "name": "festive-sale-bundle-policy",
+      "description": "Sale-weekend policy questions that the fabric-and-care rubric had no concept of — verified directly by the policy owner, run hourly during the sale window.",
+      "default_schedule_interval_hours": 1,
+      "cases": [
+        {
+          "question": "Can I use my festive sale coupon on top of the three-item bundle discount?",
+          "context": "Festive sale terms: the three-item bundle discount cannot be combined with any festive sale coupon code — coupons and bundle pricing do not stack.",
+          "reference_answer": "No — coupons and the bundle discount cannot be combined; only one applies per order.",
+          "reviewers": ["Draupadi", "Vyasa"],
+          "source": "manual_spotcheck",
+          "check_mode": "both"
+        },
+        {
+          "question": "What does the gift-wrap add-on include?",
+          "context": "Gift wrap add-on costs a flat fee per bundle and covers wrapping paper, ribbon, and a printed gift tag; it does not include a greeting card.",
+          "reference_answer": "Wrapping paper, ribbon, and a printed gift tag for a flat fee per bundle. It does not include a greeting card.",
+          "reviewers": ["Draupadi", "Vyasa"],
+          "source": "manual_spotcheck",
+          "check_mode": "both"
+        }
+      ]
+    },
+    {
+      "name": "chennai-regional-sizing",
+      "description": "A beta-tester catch — the one disclosed gap (children's sizing) the team launched with open eyes instead of guessing.",
+      "default_schedule_interval_hours": 1,
+      "cases": [
+        {
+          "question": "Is the regional size chart the same numbering for adult and children's kurtas?",
+          "context": "Regional children's size conversion table (kurtas): children's regional sizing uses an entirely separate numbering scheme from the adult regional chart — a children's size number does not correspond to the same number on the adult scale.",
+          "reference_answer": "No — children's regional sizing uses a completely separate numbering scheme from the adult chart; the same number means something different on each.",
+          "reviewers": ["Chitrangada", "vendor-rep"],
+          "source": "real_complaint",
+          "check_mode": "both"
+        }
+      ]
+    }
+  ],
+  "coverage_checks": [
+    {
+      "feature_name": "festive-sale-bundle-and-gift-wrap",
+      "launch_date": "2026-09-20",
+      "linked_suite": "festive-sale-bundle-policy",
+      "declared_gaps": [],
+      "coverage_status": "covered",
+      "answered_by": "Vyasa",
+      "re_review_due_at": "2026-09-28"
+    },
+    {
+      "feature_name": "chennai-regional-sizing-beta",
+      "launch_date": "2026-09-10",
+      "linked_suite": "chennai-regional-sizing",
+      "declared_gaps": [
+        "Children's sizing not covered in the initial 12-case beta set — extend once real beta feedback comes in."
+      ],
+      "coverage_status": "partial",
+      "answered_by": "Vyasa",
+      "re_review_due_at": "2026-10-01"
+    }
+  ]
+}

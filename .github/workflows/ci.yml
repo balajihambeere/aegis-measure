@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: aegis
+          POSTGRES_PASSWORD: aegis
+          POSTGRES_DB: aegis
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U aegis"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: aegis-measure/apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: mypy app
+      - run: alembic upgrade head
+        env:
+          DATABASE_URL: postgresql+psycopg://aegis:aegis@localhost:5432/aegis
+      - run: pytest --cov=app --cov-report=term-missing
+        env:
+          DATABASE_URL: postgresql+psycopg://aegis:aegis@localhost:5432/aegis
+          AEGIS_API_KEY: ci-test-key
+          ANTHROPIC_API_KEY: ""
+
+  reference-assistant:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aegis-measure/apps/reference-assistant
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: mypy app
+      - run: pytest
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aegis-measure/apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+      - run: npm run build
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [api, reference-assistant, web]
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t aegis-api aegis-measure/apps/api
+      - run: docker build -t aegis-reference-assistant aegis-measure/apps/reference-assistant
+      - run: docker build -t aegis-web aegis-measure/apps/web

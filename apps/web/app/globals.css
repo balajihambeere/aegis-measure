@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  @apply bg-bg text-ink antialiased;
+  font-feature-settings: "cv11", "ss01";
+}
+
+::selection {
+  background-color: rgba(91, 124, 250, 0.35);
+  color: #ffffff;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #323748 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #2a2e3b;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #3a4053;
+  background-clip: padding-box;
+}
